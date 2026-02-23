@@ -1,62 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:usecar_ki_system/features/api_client/form_api_client.dart';
+import 'package:usecar_ki_system/models/car_variable.dart';
+import 'package:usecar_ki_system/models/vehicule/damaged_features/damaged_report.dart';
+import 'package:usecar_ki_system/routes/app_route_name.dart';
+import 'package:usecar_ki_system/shared/constants/sizes.dart';
+import '../models/vehicule/technische_features/tchenic_carlisting.dart';
+import '../shared/widgets/dropdown_field.dart';
+import '../shared/widgets/nav_link.dart';
+import '../shared/widgets/number_field.dart';
+import '../shared/widgets/text_field_with_unit.dart';
 
-import '../shared/widgetss/dropdown_field.dart';
-import '../shared/widgetss/infobox.dart';
-import '../shared/widgetss/number_field.dart';
-import '../shared/widgetss/text_field_with_unit.dart';
 
-// ignore: use_key_in_widget_constructors
+
+
+
+
 class CarSalesFormPage extends StatefulWidget {
+  const CarSalesFormPage({super.key});
+
   @override
-  // ignore: library_private_types_in_public_api
-  _CarSalesFormPageState createState() => _CarSalesFormPageState();
+  State<CarSalesFormPage> createState() => _CarSalesFormPageState();
 }
 
 class _CarSalesFormPageState extends State<CarSalesFormPage> {
-  // Form data variables
-  String? selectedBrand = 'Renault';
-  String? selectedModel = 'Fiesta';
-  String? selectedYear = '2020';
-  String? selectedMonth = 'Januar';
-  String? selectedFuel = 'Benzin';
-  String? selectedTransmission = 'Manuell';
-  String? selectedColor = 'Weiß';
-  String? selectedCondition = 'Ja';
-  String? selectedOfferType = 'privat';
-  String? selectedTimeframe = 'Ich will es nach 24h';
-  String? selectedUsage = 'Privat';
-  String? selectedTargets = 'Deutschland';
-  String? selectedBodyStyle = 'Kombi';
-  String? selectedLeasingcar = 'No';
-  String? selectedReadyToDrive = 'Yes';
-  String? selectedPreviousOwnerss = '1';
-  String? selectedTransmissionType = 'mechanical';
-  String? selectedTireType = 'Summer';
-  String? selectedRimType = 'alloy wheels';
-  String? selectedWinterPackage = 'No';
+  final _formKey = GlobalKey<FormState>();
 
-  // Text field controllers
-  TextEditingController kmController = TextEditingController(text: '12.456');
-  TextEditingController powerController = TextEditingController(text: '85');
-  TextEditingController priceController = TextEditingController(text: '12.345');
-  TextEditingController cubicCapacityController = TextEditingController(
-    text: '1.4',
-  );
-  TextEditingController co2Controller = TextEditingController(text: '120');
-  TextEditingController tankCapacityController = TextEditingController(
-    text: '50',
-  );
-  TextEditingController emptyWeightController = TextEditingController(
-    text: '1200',
-  );
-  TextEditingController permittedGrossWeightController = TextEditingController(
-    text: '1800',
-  );
-  TextEditingController accelerationController = TextEditingController(
-    text: '10.5',
-  );
-  TextEditingController maxSpeedController = TextEditingController(text: '190');
-  
+  // Constants
+  final int currentYear = DateTime.now().year;
+  double? predictedPrice = 0.0;
 
   @override
   Widget build(BuildContext context) {
@@ -67,586 +38,712 @@ class _CarSalesFormPageState extends State<CarSalesFormPage> {
 
         /// custom title with logo and text
         title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             /// logo image
-            Image.asset(
-              'assets/images/logo_sfm.png',
-              height: 24,
-            ), // Replace with actual logo
-            SizedBox(width: 10),
+            Image.asset('assets/images/logo_sfm.png', height: 36),
+            const SizedBox(width: 10),
+            NavLink(label: 'Predict Use Case', routeName: predictCarRouterName),
+            const SizedBox(width: 10),
 
-            Text(
-              'predict usecar',
-              style: TextStyle(color: Colors.black, fontSize: 16),
+            /// RECOMMENDATION LINK
+            NavLink(
+              label: 'Car Recommendation',
+              routeName: recommandRouterName,
             ),
           ],
         ),
 
         /// action buttons
         actions: [
-          IconButton(icon: Icon(Icons.help_outline), onPressed: () {}),
-          IconButton(icon: Icon(Icons.person_outline), onPressed: () {}),
+          IconButton(icon: const Icon(Icons.help_outline), onPressed: () {}),
+          IconButton(icon: const Icon(Icons.person_outline), onPressed: () {}),
         ],
       ),
 
       /// body content
-      body: Form(
-      
+      body: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
 
+          child: Padding(
+            padding: const EdgeInsets.all(Sizes.insetXMedium),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: Sizes.spacingMedium,
 
-        child: SingleChildScrollView(
-          child: Card(
-            elevation: 4,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              /// form fields and sections
+              children: [
+                // Page Title
+                const Text(
+                  'Gebrautwagen vorhersagen',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
 
-                /// form fields and sections
-                children: [
-                  // Page Title
-                  Text(
-                    'Gebrautwagen vorhersagen',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                /// Vehicle Information Section
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 16),
+                  padding: const EdgeInsets.all(10),
+
+                  /// box decoration
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey.shade300, width: 1),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  SizedBox(height: 20),
 
-                  /// Vehicle Information Section
-                  Container(
+                  /// Vehicle Information Fields
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 16,
+                    children: [
+                      /// section title
+                      const Text(
+                        'Vehicle details',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
 
-                    margin: const EdgeInsets.symmetric(vertical: 16),
-                    padding: const EdgeInsets.all(10),
-                    
-                    /// box decoration
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: Colors.grey.shade300, width: 1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                      /// Brand and Modell section
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
 
-                 /// Vehicle Information Fields
-                 child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-               
-                      children: [
-                        /// section title
-                        Text(
-                          'Vehicle details',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 10),
+                        children: [
+                          ///Brand
+                          Expanded(
+                            child: DropdownField(
+                              label: 'Brands',
+                              value: selectedBrand,
+                              onChanged: (v) {
+                                setState(() => selectedBrand = v);
+                              },
+                              items: [
+                                'Renault',
+                                'Ford',
+                                'Hyundai',
+                                'Fiat',
+                                'Opel',
+                              ],
+                             
+                            ),
+                          ),
 
-                        // Marke Selection
-                        DropdownField(
-                          label: 'Brands',
-                          value: selectedBrand,
-                          onChanged: (v) => setState(() => selectedBrand = v),
-                          items: [
-                            'Renault',
-                            'Ford',
-                            'Hyundai',
-                            'Fiat',
-                            'Opel',
-                            'Ford',
-                          ],
-                        ),
-                        SizedBox(height: 10),
 
-                        /// Model Selection
-                        DropdownField(
-                          label: 'Modell',
-                          value: selectedModel,
-                          onChanged: (v) => setState(() => selectedModel = v),
-                          items: [
-                            'Grand Scenic BLUE',
-                            'Ford Focus',
-                            'Nexo Fuel Cell Sports',
-                            'Kango rapid Blue',
-                            'Traffic',
-                            'Fiesta',
-                            'Dablo cargo',
-                            'Transit connect',
-                          ],
-                        ),
-              
-                       SizedBox(height: 10),
-                       
-                        /// Is leasingcar
-                        DropdownField(
-                          label: 'Is leasingcar?',
-                          value: selectedLeasingcar,
-                          onChanged: (v) => setState(() => selectedLeasingcar = v),
-                          items: [
-                            'Yes',
-                            'No',
-                          ],
-                        ),
-                        
-                        /// Registration Date
-                        SizedBox(height: 10),
-                        Row(
+                          /// Model
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: DropdownField(
+                              label: 'Model',
+                              value: selectedModel,
+                              onChanged: (v) {
+                                setState(() => selectedModel = v);
+                              },
+                              items: [
+                                'Grand Scenic BLUE',
+                                'Focus',
+                                'Nexo Fuel Cell Sports',
+                                'Kango rapid Blue',
+                                'Traffic',
+                                'Fiesta',
+                                'Dablo cargo',
+                                'Transit connect',
+                              ],
+                            
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      /// Power Engine Kw and Horsepower
+                      Row(
+                        children: [
+                          /// Engine Power (kw)
+                          Expanded(
+                            child: NumberField(
+                              label: 'Engine Power(kilowatt)',
+                              controller: powerController,
+                              unit: 'KW',
+                             
+                            ),
+                          ),
+                         
+                          SizedBox(width: 10),
+
+                          /// Power Horsepower
+                          Expanded(
+                            child: NumberField(
+                              label: 'Engine Power(Horspower)',
+                              controller: horsepowerController,
+                              unit: 'PH',
+                            
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      /// Mileage and transmission type
+                      Row(
+                        children: [
+                          Expanded(
+                            child: NumberField(
+                              controller: mileageController,
+                              label: 'Millage',
+                              unit: 'km',
+                             
+                            ),
+                          ),
+
+                          SizedBox(width: 10),
+
+                          /// Transmission type
+                          Expanded(
+                            child: DropdownField(
+                              label: 'Transmission type',
+                              value: selectedTransmissionType,
+                              onChanged: (v) =>
+                                  setState(() => selectedTransmissionType = v),
+                              items: ['Manuell', 'Automatik'],
+                             
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      /// Region and Engine Type
+                      Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
 
-                          children: [
-
-                            /// year of first registration
-                            Expanded(
-                              child: DropdownField(
-                                label: 'Erstzulassung',
-                                value: selectedYear,
-                                onChanged: (v) =>
-                                    setState(() => selectedYear = v),
-                                items: List.generate(20, (i) => '${2025 - i}'),
-                              ),
+                        children: [
+                          /// Fuel Type
+                          Expanded(
+                            child: DropdownField(
+                              label: 'Fuel Type',
+                              value: selectedEngineType,
+                              onChanged: (v) =>
+                                  setState(() => selectedEngineType = v),
+                              items: ['Diesel', 'Electronic', 'Hydrogen'],
+                             
+                              // isDropdownOnly: false,
                             ),
-                            SizedBox(width: 10),
-                            
-                            /// month of first registration
-                            Expanded(
-                              child: DropdownField(
-                                label: 'Monat',
-                                value: selectedMonth,
-                                onChanged: (v) =>
-                                    setState(() => selectedMonth = v),
-                                items: [
-                                  'Januar',
-                                  'Februar',
-                                  'März',
-                                  'April',
-                                  'Mai',
-                                  'Juni',
-                                  'Juli',
-                                  'August',
-                                  'September',
-                                  'Oktober',
-                                  'November',
-                                  'Dezember',
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      
-
-                        SizedBox(height: 10),
-                        
-                        /// Color and Leasingcar
-                         Row(
-                       crossAxisAlignment: CrossAxisAlignment.start,
-
-    
-                             children: [
-
-                            Flexible(
-
-                            ///color
-                          child: 
-                          TextFieldWithUnit(
-                          controller: kmController,
-                          label: 'Color',
-                          unit: 'Color',
-                        ), 
-                           ),
-
-                        SizedBox(width: 10),
-
-                        /// Leasingcar
-                          Flexible(
-                            
-                          child: DropdownField(
-
-                          label: 'Leasingcar',
-                          value: selectedLeasingcar,
-                          onChanged: (v) => setState(() => selectedTransmission = v),
-                          items: ['Yes', 'No'],
-                          isDropdownOnly: true,
-                        ),
                           ),
 
-                          ],
+                          SizedBox(width: 10),
 
-
-
-                         ),
-
-
-
-                          SizedBox(height: 10),
-                        /// Body Style and Transmission type
-                         Row(
-                       crossAxisAlignment: CrossAxisAlignment.start,
-
-                          children: [
-
-                        /// Body Style
-                           Flexible(
-                     child:DropdownField(
-                          label: 'Body Style',
-                          value: selectedBodyStyle,
-                          onChanged: (v) => setState(() => selectedBodyStyle = v),
-                          items: ['van/Minivan', 'Kombilimousine', 'Limousine', 'Cabrio','transporter','Van','Kombi'],
-
-                        ),
-                           ),
-                     
-                      /// Transmission type
-                       SizedBox(width: 10),
-                         Flexible(
-
-                     child: DropdownField(
-                          label: 'Transmission type',
-                          value: selectedTransmissionType,
-                          onChanged: (v) => setState(() => selectedTransmissionType = v),
-                          items: ['6 Gear mechanical', 'mechanical', '5 Gear mechanical', '6 Gear automatik','8 Gear automatik'],
-
-                        ),
-                           ),
-                    
-                          ],
-                          
-                          )
-                      
-                      ],
-
-
-                    ),
-                  ),
-
-                  SizedBox(height: 20),
-
-                  /// Technical Features Section
-                  Container(
-                    margin: const EdgeInsets.symmetric(
-                      vertical: 16,
-                      horizontal: 10,
-                    ),
-                    padding: const EdgeInsets.all(10),
-
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: Colors.grey.shade300, width: 1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-
-                      children: [
-
-                        /// Titles
-                        Text(
-                          'Technic Features',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-
-                        SizedBox(height: 20),
-
-                        /// Mileage
-                        TextFieldWithUnit(
-                          controller: kmController,
-                          label: 'Millage',
-                          unit: 'km',
-                        ),
-                        SizedBox(height: 10),
-
-                        /// Power Engine
-                        Row(
-                          children: [
-                            Flexible(
-                              child: NumberField(
-                                label: 'PS',
-                                controller: powerController,
-                                unit: 'PS',
+                          /// Year of manufacture
+                          Expanded(
+                            child: DropdownField(
+                              label: 'Year of manufactuure',
+                              value: selectedYear,
+                              onChanged: (v) =>
+                                  setState(() => selectedYear = v),
+                              items: List.generate(
+                                currentYear - 1990 + 1,
+                                (i) => (1990 + i).toString(),
                               ),
+                              isDropdownOnly: false,
+                             
                             ),
-
-                            SizedBox(width: 10),
-                            Flexible(
-                              child: NumberField(
-                                label: 'kW',
-                                controller: TextEditingController(text: '62'),
-                                unit: 'kW',
-                              ),
-                            ),
-                            
-                            SizedBox(width: 10),
-                            Flexible(
-                              child: NumberField(
-                                label: 'l/100km',
-                                controller: TextEditingController(text: '5.2'),
-                                unit: 'l/100km',
-                              ),
-                            ),
-                          
-                          ],
-                        ),
-                      
-                        SizedBox(height: 10),
-                   /// Cubic Capacity , CO2 Emission, Tank Capacity
-                  Row(
-                    children: [
-                      Flexible(child: NumberField(label: 'Empty Weight(kg)', controller: emptyWeightController, unit: 'Kg')),
-                      SizedBox(width: 10),
-                      Flexible(child: NumberField(label: 'Permitted gross weight(kg)', controller: permittedGrossWeightController, unit: 'Kg')),
-                      SizedBox(width: 10),
-                      Flexible(child: NumberField(label: 'Acceleration (0-100 km/h)', controller: accelerationController,  unit: 'km/h')),
-                      SizedBox(width: 10),
-                      Flexible(child: NumberField(label: 'Max Speed (km/h)', controller: maxSpeedController, unit: 'km/h')),
-                      
-                    ],
-                  ),
-
-                  SizedBox(height: 20),
-
-                  Container(
-                    padding: EdgeInsets.all(10),
-
-                    decoration: BoxDecoration(
-                      color: Color(0xFFF9F9F9),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                      /// Titles
-                        Text(
-                          'Zulassung & Versicherung',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
- 
-
-                      ],
+                          ),
+                        ],
                       ),
-                  )
 
+                      /// Registration Date
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
 
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  
-                  ///Rim and Tires Section
-                  Container(
-                    
-                    margin: const EdgeInsets.symmetric(
-                      vertical: 16,
-                      horizontal: 10,
-                    ),
-                    padding: const EdgeInsets.all(10),
-                    
-                    /// box decoration
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: Colors.grey.shade300, width: 1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    
-                    ///tires and rims fields
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-
-                      children: [
-
-                      /// Titles
-                        Text(
-                          'Rim and Tires',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      
-                      // Tire Type, Rim Type, Winter Package
-                      Container(
-
-                        padding: EdgeInsets.all( 10),
-                        child: Row(
-                          children: [
-
-                            /// Tire Type
-                            Flexible(
-                              child: DropdownField(
-                                label: 'Tire Type',
-                                value: selectedTireType,
-                                onChanged: (v) =>
-                                    setState(() => selectedTireType = v),
-                                items: [
-                                  'Summer',
-                                  'Winter',
-                                  'Allseason',
-                                ],
-                              ),
-                            ),
-
-                            SizedBox(width: 10),
-
-                            /// Rim Type
-                            Flexible(
-                              child: DropdownField(
-                                label: 'Rim Type',
-                                value: selectedRimType,
-                                onChanged: (v) =>
-                                    setState(() => selectedRimType = v),
-                                items: [
-                                  'alloy wheels',
-                                  'steel wheels',
-                                  'standard rims',
-                                ],
-                              ),
-                            ),
-                            SizedBox(width: 10),
-
-                             /// has winter package
-                            Flexible(
-                              child: DropdownField(
-                                label: 'Winter Package',
-                                value: selectedWinterPackage,
-                                onChanged: (v) =>
-                                    setState(() => selectedWinterPackage = v),
-                                items: [
-                                  'Yes',
-                                  'No',
-                                ],
-                              ),
-                            ),
-                          
-                          
-                          ],
-                        ),
-                      )
-                       ,
-                       
-                      /// Damage Information Section
-                       Container(
-
-                        padding: EdgeInsets.all( 10),
-                        child: Row(
-                          children: [
-
-                            /// Damage tire
-                            Flexible(
-                              child: DropdownField(
-                                label: 'Damage Tire',
-                                value: selectedTireType,
-                                onChanged: (v) =>
-                                    setState(() => selectedTireType = v),
-                                items: [
-                                  'Yes',
-                                  'No',
-                                  'Unknown',
-                                ],
-                              ),
-                            ),
-
-                            SizedBox(width: 10),
-
-                            /// Damage Rim 
-                            Flexible(
-                              child: DropdownField(
-                                label: 'Damage Rim ',
-                                value: selectedRimType,
-                                onChanged: (v) =>
-                                    setState(() => selectedRimType = v),
-                                   items: [
-                                  'Yes',
-                                  'No',
-                                  'Unknown',
-                                ],
-                              ),
-                            ),
-                            SizedBox(width: 10),
-
-                             /// tire missing
-                            Flexible(
-                              child: DropdownField(
-                                label: 'Is Tire missing',
-                                value: selectedWinterPackage,
-                                onChanged: (v) =>
-                                    setState(() => selectedWinterPackage = v),
-                                items: [
-                                  'Yes',
-                                  'No',
-                                  'Unknown',
-                                ],
-                              ),
-                            ),
-                          
-                          
-                          ],
-                        ),
-                      
-                      )
-                       
-
-                      ]
-                  ),
-                  ),
-                  SizedBox(height: 20),
-
-
-                  // Action Buttons
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            // Submit logic
-                            showDialog(
-                              context: context,
-                              builder: (ctx) => AlertDialog(
-                                title: Text('Danke!'),
-                                content: Text(
-                                  'Dein Auto wurde erfolgreich eingestellt.',
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: Navigator.of(ctx).pop,
-                                    child: Text('OK'),
+                        children: [
+                          /// day of Tuv
+                          Expanded(
+                            child: DropdownField(
+                              label: 'Next TUV: Day',
+                              value: selectedDay,
+                              onChanged: (v) => setState(() => selectedDay = v),
+                              items:
+                                  //List.generate(20, (i) => '${2025 + i}')
+                                  List.generate(
+                                    12,
+                                    (i) => (i + 1).toString().padLeft(2, '0'),
                                   ),
-                                ],
-                              ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFFE63946), // Red button
-                            padding: EdgeInsets.symmetric(vertical: 12),
+                             
+                            ),
                           ),
-                          child: Text(
-                            'Predict',
-                            style: TextStyle(color: Colors.white),
+
+                          /// month of Tuv
+                          Expanded(
+                            child: DropdownField(
+                              label: 'Next TUVMonth',
+                              value: selectedTuvMonth,
+                              onChanged: (v) =>
+                                  setState(() => selectedTuvMonth = v),
+                              items: List.generate(
+                                12,
+                                (i) => (i + 1).toString().padLeft(2, '0'),
+                              ),
+                            
+                            ),
+                          ),
+
+                          /// year of first registration
+                          Expanded(
+                            child: DropdownField(
+                              label: 'Next TUV Year',
+                              value: selectedTuvYear,
+                              onChanged: (v) =>
+                                  setState(() => selectedTuvYear = v),
+                              items:
+                                  // List.generate(
+                                  //                       currentYear - 1990 + 1,
+                                  //                       (i) => (1990 + i).toString(),
+                                  //                     )
+                                  List.generate(20, (i) => '${2025 - i}'),
+                             
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                        ],
+                      ),
+
+                      /// Body Style and number of previous own
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+
+                        children: [
+                          /// Nber of previous own
+                          Expanded(
+                            child: TextFieldWithUnit(
+                              controller: nberOfPreviousOwn,
+                              label: 'Nber of previous own',
+                                                         ),
+                          ),
+
+                          /// Body Style
+                          Expanded(
+                            child: DropdownField(
+                              label: 'Body Style',
+                              value: selectedBodyStyle,
+                              onChanged: (v) =>
+                                  setState(() => selectedBodyStyle = v),
+                              items: [
+                                'van/Minivan',
+                                'Kombilimousine',
+                                'Limousine',
+                                'Cabrio',
+                                'transporter',
+                                'Van',
+                                'Kombi',
+                              ],
+                             
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          /// Accident History
+                          Expanded(
+                            child: DropdownField(
+                              label: 'Accident history?',
+                              value: selectedAccidentHistory,
+                              onChanged: (v) =>
+                                  setState(() => selectedAccidentHistory = v),
+                              items: ['Yes', 'No'],
+                             
+                              // isDropdownOnly: false,
+                            ),
+                          ),
+
+                          /// Tire Type
+                          Expanded(
+                            child: DropdownField(
+                              label: 'Tire Type',
+                              value: selectedTireType,
+                              onChanged: (v) =>
+                                  setState(() => selectedTireType = v),
+                              items: ['Summer', 'Winter', 'Allseason'],
+                            
+                            ),
+                          ),
+                        
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+
+
+                /// Damage Report Section
+                Container(
+                  margin: const EdgeInsets.symmetric(
+                    vertical: 16,
+                    horizontal: 10,
+                  ),
+                  padding: const EdgeInsets.all(10),
+
+                  /// box decoration
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey.shade300, width: 1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+
+                  /// doors and seats fields
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 16,
+                    children: [
+                      // Titles
+                      Text(
+                        'Damages Report',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+
+                      /// front and rear car
+                      Row(
+                        spacing: 16,
+                        children: [
+                          // Damaged front Car
+                          Expanded(
+                            child: DropdownField(
+                              label: 'Damaged front Car',
+                              value: selectedDamagedFront,
+                              onChanged: (v) =>
+                                  setState(() => selectedDamagedFront = v),
+                              items: ['Yes', 'No'],
+                             
+                            ),
+                          ),
+
+                          // Damaged rear Car
+                          Expanded(
+                            child: DropdownField(
+                              label: 'Damaged rear Car',
+                              value: selectedDamagedRear,
+                              onChanged: (v) =>
+                                  setState(() => selectedDamagedRear = v),
+                              items: ['Yes', 'No'],
+                              isDropdownOnly: false,
+                              
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      /// Left and Right side car
+                      Row(
+                        spacing: 16,
+                        children: [
+                          // Damaged left side car
+                          Expanded(
+                            child: DropdownField(
+                              label: 'Damaged left side car',
+                              value: selectedDamagedLeftSide,
+                              onChanged: (v) =>
+                                  setState(() => selectedDamagedLeftSide = v),
+                              items: ['Yes', 'No'],
+                            
+                            ),
+                          ),
+
+                          // Damaged right side car
+                          Expanded(
+                            child: DropdownField(
+                              label: 'Damaged right side car',
+                              value: selectedDamagedRightSide,
+                              onChanged: (v) =>
+                                  setState(() => selectedDamagedRightSide = v),
+                              items: ['Yes', 'No'],
+                              isDropdownOnly: false,
+                           
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      /// Damaged interior and exterior
+                      Row(
+                        spacing: 16,
+                        children: [
+                          // Damaged interior
+                          Expanded(
+                            child: DropdownField(
+                              label: 'Damaged interior',
+                              value: selectedDamagedInterior,
+                              onChanged: (v) =>
+                                  setState(() => selectedDamagedInterior = v),
+                              items: ['Yes', 'No'],
+                           
+                            ),
+                          ),
+
+                          // Damaged Exterior
+                          Expanded(
+                            child: DropdownField(
+                              label: 'Damaged Exterior',
+                              value: selectedDamagedExterior,
+                              onChanged: (v) =>
+                                  setState(() => selectedDamagedExterior = v),
+                              items: ['Yes', 'No'],
+                              isDropdownOnly: false,
+                             
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      /// Damaged rim and tire
+                      Row(
+                        spacing: 16,
+                        children: [
+                          // Damaged rim
+                          Expanded(
+                            child: DropdownField(
+                              label: 'Damaged rim',
+                              value: selectedDamagedRim,
+                              onChanged: (v) =>
+                                  setState(() => selectedDamagedRim = v),
+                              items: ['Yes', 'No'],
+                            
+                            ),
+                          ),
+
+                          // Damaged tire
+                          Expanded(
+                            child: DropdownField(
+                              label: 'Damaged tire',
+                              value: selectedDamagedTire,
+                              onChanged: (v) =>
+                                  setState(() => selectedDamagedTire = v),
+                              items: ['Yes', 'No'],
+                              isDropdownOnly: false,
+                              
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      /// Damaged roof beam and seats
+                      Row(
+                        spacing: 16,
+                        children: [
+                          // Damaged roof beam
+                          Expanded(
+                            child: DropdownField(
+                              label: 'Damaged roof',
+                              value: selectedDamagedRoofBeam,
+                              onChanged: (v) =>
+                                  setState(() => selectedDamagedRoofBeam = v),
+                              items: ['Yes', 'No'],
+                             
+                            ),
+                          ),
+
+                          // Damaged seats
+                          Expanded(
+                            child: DropdownField(
+                              label: 'Damaged seats',
+                              value: selectedDamagedSeats,
+                              onChanged: (v) =>
+                                  setState(() => selectedDamagedSeats = v),
+                              items: ['Yes', 'No'],
+                              isDropdownOnly: false,
+                          
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      ///Left and Right door
+                      Row(
+                        spacing: 16,
+                        children: [
+                          // Damaged left door
+                          Expanded(
+                            child: DropdownField(
+                              label: 'Damaged left door',
+                              value: selectedDamagedLeftDoor,
+                              onChanged: (v) =>
+                                  setState(() => selectedDamagedLeftDoor = v),
+                              items: ['Yes', 'No'],
+                             
+                            ),
+                          ),
+
+                          // Damaged right door
+                          Expanded(
+                            child: DropdownField(
+                              label: 'Damaged right door',
+                              value: selectedDamagedRightDoor,
+                              onChanged: (v) =>
+                                  setState(() => selectedDamagedRightDoor = v),
+                              items: ['Yes', 'No'],
+                              isDropdownOnly: false,
+                             
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      /// interior dirty and damaged carosserie
+                      Row(
+                        spacing: 16,
+
+                        children: [
+                          // Damaged carosserie
+                          Expanded(
+                            child: DropdownField(
+                              label: 'Damaged carosserie',
+                              value: selectedDamagedCarosserie,
+                              onChanged: (v) =>
+                                  setState(() => selectedDamagedCarosserie = v),
+                              items: ['Yes', 'No'],
+                            
+                            ),
+                          ),
+
+                          // interior dirty
+                          Expanded(
+                            child: DropdownField(
+                              label: 'Interior dirty',
+                              value: selectedInteriorDirty,
+                              onChanged: (v) =>
+                                  setState(() => selectedInteriorDirty = v),
+                              items: ['Yes', 'No'],
+                              isDropdownOnly: false,
+                            
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                /// Predict Button and result
+                Column(
+                  spacing: 16,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+
+                  children: [
+
+                    /// Predict Button
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () async {
+
+                          /// validate form and prepare data to send to API
+                          if (_formKey.currentState!.validate()) {
+                            _formKey.currentState!.save();
+
+                            try {
+                              // prepare data to send to API
+                              final carData = TechnicCarListing(
+                                brand: selectedBrand ?? '',
+                                model: selectedModel ?? '',
+                                year: selectedYear ?? '',
+                                enginePowerPs:
+                                    int.tryParse(powerController.text) ?? 0,
+                                enginePowerHs:
+                                    int.tryParse(powerController.text) ?? 0,
+                                mileage:
+                                    double.tryParse(mileageController.text) ??
+                                    0,
+                                engineType: selectedEngineType ?? ' ',
+                                nextTuvYear: selectedTuvYear ?? '',
+                                nextTuvMonate:
+                                    selectedTuvMonth ?? '', // November
+                                nextTuvDay: selectedDay ?? '',
+                                nberPreviousOwners:
+                                    selectedNberPreviousOwners ?? '',
+                                bodyStyle: selectedBodyStyle ?? '',
+                                transmissionType:
+                                    selectedTransmissionType ?? '',
+                                tireType: selectedTireType ?? '',
+                                accidentHistory: selectedAccidentHistory ?? '',
+                              );
+
+                              // Damage Report data
+                              final damagedReport = DamageReport(
+                                damagedFront: selectedDamagedFront == 'Yes'
+                                    ? 1
+                                    : 0,
+                                damagedRear: selectedDamagedRear == 'Yes'
+                                    ? 1
+                                    : 0,
+                                damagedLeftSide:
+                                    selectedDamagedLeftSide == 'Yes' ? 1 : 0,
+                                damagedRightSide:
+                                    selectedDamagedRightSide == 'Yes' ? 1 : 0,
+                                damagedInterior:
+                                    selectedDamagedInterior == 'Yes' ? 1 : 0,
+                                damagedExterior:
+                                    selectedDamagedExterior == 'Yes' ? 1 : 0,
+                                damagedTire: selectedDamageTire == 'Yes'
+                                    ? 1
+                                    : 0,
+                                damagedRim: selectedDamageRim == 'Yes' ? 1 : 0,
+                                damagedRoofBeam:
+                                    selectedDamagedRoofBeam == 'Yes' ? 1 : 0,
+                                damagedLeftDoor:
+                                    selectedDamagedLeftDoor == 'Yes' ? 1 : 0,
+                                damagedRightDoor:
+                                    selectedDamagedRightDoor == 'Yes' ? 1 : 0,
+                                damagedSeats: selectedDamagedSeats == 'Yes'
+                                    ? 1
+                                    : 0,
+                                interiorDirty: selectedInteriorDirty == 'Yes'
+                                    ? 1
+                                    : 0,
+                                damagedCarosserie:
+                                    selectedDamagedCarosserie == 'Yes' ? 1 : 0,
+                              );
+
+                              /// result to price predict
+                              final result = await FormApiClient().submitForm(
+                                carData,
+                                damagedReport,
+                              ); // send to python
+
+                              setState(() {
+                                predictedPrice = result;
+                              });
+                            } catch (e) {
+                              print("FEHLER: $e");
+                            }
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFFE63946), // Red button
+                          padding: EdgeInsets.symmetric(vertical: 12),
+                        ),
+
+                        /// predict text
+                        child: Text(
+                          'Predict',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 10),
+
+                    /// Display predicted price if available
+                    if (predictedPrice != null && predictedPrice != 0.0)
+                      SizedBox(
+                       width: double.infinity,
+                        child: Text(
+                          'Predicted Price: \$${(predictedPrice ?? 0).toStringAsFixed(2)}',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
-                      SizedBox(width: 10),
-
-                      // ElevatedButton(
-                      //   onPressed: () {
-                      //     // Cancel or reset
-                      //     setState(() {
-                      //       kmController.clear();
-                      //       powerController.clear();
-                      //       priceController.clear();
-                      //     });
-                      //   },
-                      //   style: ElevatedButton.styleFrom(
-                      //     backgroundColor: Colors.white,
-                      //     foregroundColor: Color(0xFFE63946),
-                      //     side: BorderSide(color: Color(0xFFE63946)),
-                      //     padding: EdgeInsets.symmetric(vertical: 12),
-                      //   ),
-
-                      //   // child: Row(
-                      //   //   mainAxisSize: MainAxisSize.min,
-                      //   //   children: [
-                      //   //     Icon(Icons.check_circle, size: 16),
-                      //   //     SizedBox(width: 5),
-                      //   //     Text('Mir ein kostenloses Fahrzeugangebot'),
-                      //   //   ],
-                      //   // ),
-
-                      // ),
-                    ],
-                  ),
-                ],
-              ),
+                 
+                  ],
+                ),
+              ],
             ),
           ),
         ),

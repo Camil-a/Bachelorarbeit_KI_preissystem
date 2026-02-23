@@ -15,26 +15,13 @@
 /templates/usecar_ki_system/.idea/
 /templates/usecar_ki_system/.metadata
 /templates/usecar_ki_system/analysis_options.yaml
-/templates/usecar_ki_system/pubspec.lock
-/templates/usecar_ki_system/pubspec.yaml
+**/MyApplication/
+/templates/MyApplication/gradlew
+/templates/MyApplication/.gradlew.bat
+/templates/MyApplication/.idea
 
 
 
 
 
 
-
-
-
-/templates/usecar_ki_system/lib/generated_plugin_registrant.dart
-/templates/usecar_ki_system/lib/features/usecar_ki_system/usecar_ki_system_model.dart
-/templates/usecar_ki_system/lib/features/usecar_ki_system/usecar_ki_system_service.dart
-/templates/usecar_ki_system/lib/features/usecar_ki_system/usecar_ki_system_view.dart
-/templates/usecar_ki_system/lib/features/usecar_ki_system/usecar_ki_system_view_model.dart
-/templates/usecar_ki_system/lib/features/usecar_ki_system/usecar_ki_system_widgets.dart
-/templates/usecar_ki_system/lib/features/usecar_ki_system/usecar_ki_system_constants.dart
-/templates/usecar_ki_system/lib/features/usecar_ki_system/usecar_ki_system_utils.dart
-/templates/usecar_ki_system/lib/features/usecar_ki_system/usecar_ki_system_extensions.dart
-/templates/usecar_ki_system/lib/features/usecar_ki_system/usecar_ki_system_dependencies.dart
-/templates/usecar_ki_system/lib/features/usecar_ki_system/usecar_ki_system_routes.dart
-/templates/usecar_ki_system/lib/features/usecar_ki_system/usecar_ki_system_localization.dart
