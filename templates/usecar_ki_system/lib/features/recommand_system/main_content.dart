@@ -1,44 +1,70 @@
 
 import 'package:flutter/material.dart';
 import 'package:usecar_ki_system/models/car.dart';
+import 'package:usecar_ki_system/models/vehicule/technische_features/vehicule_Form_data_save.dart';
 import 'package:usecar_ki_system/shared/widgets/card_card.dart';
+import 'package:usecar_ki_system/shared/widgets/dropdown_field.dart';
+import 'package:usecar_ki_system/shared/constants/colors.dart';
+import 'package:usecar_ki_system/shared/constants/sizes.dart';
 
 
 
-class MainContent extends StatelessWidget {
-  //String _selectedSort = 'price';
-  //final Future<List<dynamic>> carsFuture_model;
-    final Future<List<Cars>> carsFuture;
+class MainContent extends StatefulWidget {
+  final Future<List<Cars>> carsFuture;
+  final Function(CarDataSaved) onFilterChanged;
 
 
-  const MainContent({super.key, required this.carsFuture});
+  const MainContent({super.key, required this.carsFuture,
+  required this.onFilterChanged
+   });
 
+  @override
+  _MainContentState createState() => _MainContentState();
+}
+
+class _MainContentState extends State<MainContent> {
+ 
+ // sort and save search
+  String selectedValue = 'Model';
+  TextEditingController priceController = TextEditingController();
+  TextEditingController mileageController = TextEditingController();
+  // Model Auswahl
+  String? selectedModel;
+
+
+void _sendFilter() {
+  CarDataSaved data = CarDataSaved();
+
+  // data.model = selectedModel;
+  // data.price = double.tryParse(priceController.text);
+  // data.mileage = double.tryParse(mileageController.text);
+
+    if (selectedValue == 'Model') {
+    data.model = selectedModel;
+    data.price = null; // wichtig
+  } else if (selectedValue == 'Price') {
+    data.model = null; // wichtig
+    data.price = double.tryParse(priceController.text);
+  }
+
+  widget.onFilterChanged(data);
+}
   @override
   Widget build(BuildContext context) {
     return Column(
-      spacing: 16,
+    //  spacing: 16,
       children: [
 
         /// search bar to describe the car you are looking for
-        
-      //     Expanded(
-      //      child:
-      //   _buildSearchBar()
-
-      //     ),
-              
-         
-
-      //  // _buildSortAndSave(),
-      //    Expanded(
-      //      child: _buildSortAndSave()
-      //       ),
+    
               _buildSearchBar(),
-                _buildSortAndSave(),
+              SizedBox(height: 16),
+
+               _buildSortAndSave(),
+               SizedBox(height: 16),
+
 
         /// car list
-        //_buildCarList(),
-
          Expanded(
            child:   
            _buildCarList()
@@ -48,15 +74,24 @@ class MainContent extends StatelessWidget {
   }
 
  Widget _buildCarList() {
+
+  
     return FutureBuilder<List<Cars>>(
-      future: carsFuture,
+      future: widget.carsFuture,
       builder: (context, snapshot) {
+
         if (snapshot.connectionState == ConnectionState.waiting) {
+
           return const Center(child: CircularProgressIndicator());
+
         } else if (snapshot.hasError) {
+
           return Center(child: Text('Error: ${snapshot.error}'));
+
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+
           return const Center(child: Text('Keine Autos gefunden'));
+          
         } else {
           final cars = snapshot.data!;
           return ListView.builder(
@@ -69,6 +104,7 @@ class MainContent extends StatelessWidget {
       }, 
     );
   }
+
 /// search bar to describe the car you are looking for
   Widget _buildSearchBar() {
     return Padding(
@@ -77,14 +113,17 @@ class MainContent extends StatelessWidget {
         decoration: InputDecoration(
           hintText: 'Beschreibe, welches Auto du suchst',
           prefixIcon: const Icon(Icons.search),
+
+
           suffixIcon: IconButton(
             icon: const Icon(Icons.arrow_forward),
             onPressed: () {},
           ),
+
           filled: true,
-          fillColor: Colors.grey[100],
+          fillColor: AppColors.inputFill,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(25),
+            borderRadius: BorderRadius.circular(Sizes.radiusSearch),
             borderSide: BorderSide.none,
           ),
         ),
@@ -92,57 +131,108 @@ class MainContent extends StatelessWidget {
     );
   }
  
+
+
+
  Widget _buildSortAndSave() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          Expanded(
-            child: DropdownButtonFormField<String>(
-              value: 'Price',
-              items: [
-                DropdownMenuItem(
-                  value: 'Price',
-                  child: Text(' Price'),
-                ),
-                DropdownMenuItem(
-                  value: 'Mileage',
-                  child: Text(' Mileage'),
-                ),
-                DropdownMenuItem(
-                value: 'Model',
-                child: Text('Model'),
-              ),
+      child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
 
-              
-                // Weitere Sortieroptionen...
+        children: [
+           
+            DropdownButtonFormField<String>(
+             hint: const Text("Select a sort option"),
+              value: selectedValue,
+              items:const [
+                DropdownMenuItem( value: 'Price',child: Text('Price'), ),
+                DropdownMenuItem( value: 'Mileage',child: Text('Mileage'), ),
+                DropdownMenuItem( value: 'Model', child: Text('Model'), ),
               ],
-              onChanged: (_) {},
+              
+             onChanged: (value) {
+                    setState(() {
+                      selectedValue = value!;
+                    });
+                     _sendFilter();
+
+                  },
+
               decoration: InputDecoration(
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(Sizes.radiusSmall),
                 ),
               ),
             ),
-          ),
          
+
+           
+  
+            const SizedBox(height: 12),
+
+    if (selectedValue == 'Price') 
+
+          SizedBox(
+            width: double.infinity,
+            child:   TextField(
+            controller: priceController,
+            keyboardType: TextInputType.number,
+
+            decoration: InputDecoration(
+              labelText: "Enter Price",
+              border: OutlineInputBorder(),
+              suffixIcon: IconButton(
+                icon: const Icon(Icons.arrow_forward),
+                onPressed: () {
+                  _sendFilter();
+                },
+              ),
+            ),
+                 
+                  ),
+            ),
+
+             if (selectedValue== 'Mileage')
+          TextField(
+            controller: mileageController,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              labelText: 'Enter Mileage (km)',
+              border: OutlineInputBorder(),
+            ),
+              onChanged: (value) {
+              _sendFilter();
+                }
+
+          ),  
+            if (selectedValue== 'Model')
+
+             DropdownField(
+                              label: 'Choise the model',
+                              value: selectedModel,
+                              onChanged: (value) {
+                                setState(() => selectedModel = value);
+                                _sendFilter();
+                              },
+                              items: [
+                                'Grand Scenic BLUE',
+                                'Focus',
+                                'Nexo Fuel Cell Sports',
+                                'Kango rapid Blue',
+                                'Traffic',
+                                'Fiesta',
+                                'Dablo cargo',
+                                'Transit connect',
+                                'Tuscson',
+                              ],
+                            
+                            ),
+
         ],
       ),
     );
   }
-
-
-  // Widget _buildCarList() {
-  //   return Expanded(
-    
-  //     child: ListView(
-  //       children: [
-  //         CarCard(car: car),
-  //       ],
-  //     ),
-  //   );
-  // }
-
    
 }
   

@@ -1,5 +1,7 @@
 
 import 'package:flutter/material.dart';
+import 'package:usecar_ki_system/shared/constants/colors.dart';
+import 'package:usecar_ki_system/shared/constants/sizes.dart';
 
 class NumberField extends StatelessWidget {
   final String label;
@@ -44,11 +46,22 @@ Widget build(BuildContext context) {
         decoration: InputDecoration(
           labelText: label,
           filled: true,
-          fillColor: Colors.grey[100],
-          border: const OutlineInputBorder(),
+          fillColor: AppColors.inputFill,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(Sizes.radiusInput),
+            borderSide: const BorderSide(color: AppColors.inputBorder),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(Sizes.radiusInput),
+            borderSide: const BorderSide(color: AppColors.inputBorder),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(Sizes.radiusInput),
+            borderSide: const BorderSide(color: AppColors.primary, width: 2),
+          ),
 
           suffixIcon: value.text.trim().isNotEmpty
-              ? const Icon(Icons.check, color: Colors.green, size: 16)
+              ? const Icon(Icons.check, color: AppColors.inputValidIcon, size: 16)
               : null,
         ),
       );

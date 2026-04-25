@@ -1,6 +1,6 @@
 
 
-import os,cv2
+import os
 from joblib import load
 import pandas as pd
 from fastapi import FastAPI
@@ -9,57 +9,48 @@ from fastapi.staticfiles import StaticFiles
 
 
 fastAPI = FastAPI()
-fastAPI.mount("/images", StaticFiles(directory="Data/usecar_image"), name="images")
-
-
-
-
+fastAPI.mount("/images", StaticFiles(directory="Data/usecar_image"), name="images") # Pfad anpassen, wenn nötig
 feature_Model='Model'
 feature_price='Sale price'
-
-
+feature_milleage='Mileage'
 # load Cosine Similarity Matrix
 cosine_sim_path = os.path.join(os.path.dirname(__file__), 'cosine_similarity.joblib')
+cosine_sim_item_path = os.path.join(os.path.dirname(__file__), 'cosine_similarity_collaborativ_filter_item.joblib')
 
 # load DataFrame
 dataFrame_path = os.path.join(os.path.dirname(__file__), 'dataFrame.joblib')
 
 data = load(dataFrame_path)
 cosine_sim=load(cosine_sim_path)
+cosine_sim_item=load(cosine_sim_item_path)
 
 print("Existiert Datei cosinuspath?", os.path.exists(cosine_sim_path))
 
-
-
-base_image_dir = "Data/usecar_image"
+#base_image_dir = "Data/usecar_image"
 base_image_dir = os.path.join(os.path.dirname(__file__), "../Data/usecar_image")
 
 IMAGE_ROOT = os.path.join(os.path.dirname(__file__), "../Data/usecar_image")  # Pfad anpassen
 #print("Existiert Datei IMAGE._ROOT?---------------------------------------------------", os.path.exists(IMAGE_ROOT))
 
 
-
-# Neue Spalte für Bilder
-data['images'] 
-      
 def set_cars(data):
     cars = []
 
     for idx, row in data.iterrows():
         folder_name = row["images"]
-       
+        
         image_urls = [
             f"http://localhost:5000/usecar_image/{folder_name}/{os.path.basename(img)}"
             for img in row["image_files"]
         ]
-
+        #print(f"Image URLs for {folder_name}:", image_urls)
         cars.append({
             "brand": row["Brand"],
             "model": row["Model"],
             "fueltype": row["Fueltype"],
             "item_id": int(row["item_id"]),
             "Sale_price": float(row["Sale price"]),
-            "next_TUV": (row["nextTUV"]),
+            "next_TUV": (row["days_to_TUV"]),
             "mileage": float(row["Mileage"]),
             "engine_power": int(row["Engine_power(kilowatt)"]),
             "images": image_urls
@@ -68,10 +59,16 @@ def set_cars(data):
     return cars
 
 
+
 def save_image_to_folder_in_data(base_image_dir):
+
+    # Ensure image_files column exists
+    if 'image_files' not in data.columns:
+        data['image_files'] = [[] for _ in range(len(data))]
+    
     # alle Ordner durchlaufen
     for root, dirs, files in os.walk(base_image_dir):
-        
+
         #lists all files 
         folder_name = os.path.basename(root)   
         
@@ -82,15 +79,35 @@ def save_image_to_folder_in_data(base_image_dir):
             images = [os.path.join(root, f) for f in files
                     if f.lower().endswith((".png", ".jpg", ".jpeg"))]
             
+            #print(images)
             # passende Zeile finden und speichern
             # passende Zeilen holen
             matching_rows = data.index[data['images'] == folder_name]
 
             for idx in matching_rows:
                 data.at[idx, 'image_files'] = images
-    #print(data)
 
-save_image_to_folder_in_data(base_image_dir)
+    print('--------print image Cars--<<|||||||||||||||||||||||||||||||||--------')
+    print(data)
+
+def save_image_to_folder_in_datas(base_image_dir):
+    data['image_files'] = [[] for _ in range(len(data))]
+
+    for idx, row in data.iterrows():
+        folder_name = str(row["images"]).strip()
+        folder_path = os.path.join(base_image_dir, folder_name)
+
+        # check if folder exists
+        if os.path.isdir(folder_path):
+            images = [
+                os.path.join(folder_path, f)
+                for f in os.listdir(folder_path)
+                if f.lower().endswith((".png", ".jpg", ".jpeg"))
+            ]
+            data.at[idx, 'image_files'] = images
+        else:
+            print(f" Folder not found: {folder_path}")    
+save_image_to_folder_in_data(IMAGE_ROOT)
     
 def recommend_contentbased_by_models(model_name, top_n=5):
 
@@ -119,9 +136,8 @@ def recommend_contentbased_by_models(model_name, top_n=5):
         print(e)
         return []
     
-print('--------Recommd----------')
-print(recommend_contentbased_by_models('Focus'))
-    
+
+
 
 def recommend_similar_cars_by_price(price, top_n=10):
     try:
@@ -152,6 +168,9 @@ def recommend_similar_cars_by_price(price, top_n=10):
         return []  # Leere DataFrame zurückgeben
 
 
+
+
+
 def get_cars():
     cars = []
 
@@ -174,15 +193,12 @@ def get_cars():
             "model": row["Model"],
             "item_id": int(row["item_id"]),
             "Sale_price": float(row["Sale price"]),
-            "next_TUV": (row["nextTUV"]),
+            "next_TUV": (row["days_to_TUV"]),
             "images": image_urls
         })
 
     return cars
 
-
-
-#print(get_cars())
 
 
 

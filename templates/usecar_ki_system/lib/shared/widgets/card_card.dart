@@ -1,6 +1,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:usecar_ki_system/models/car.dart';
+import 'package:usecar_ki_system/shared/constants/colors.dart';
+import 'package:usecar_ki_system/shared/constants/sizes.dart';
 
 
 class CarCard extends StatelessWidget {
@@ -13,7 +15,7 @@ class CarCard extends StatelessWidget {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(Sizes.radiusButton),
       ),
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -28,18 +30,6 @@ class CarCard extends StatelessWidget {
               children: [
 
 
-                /// Cars Image
-                // ClipRRect(
-                //   borderRadius: BorderRadius.circular(10),
-                //   child: Image.network(
-                //    //"${car.images?? "–"}",
-                //     car.images.isNotEmpty ? car.images[0] : 'https://via.placeholder.com/260x150',
-
-                //     width: 260,
-                //     height: 150,
-                //     fit: BoxFit.cover,
-                //   ),
-                // ),
 
                   SizedBox(
                     width: 260,
@@ -47,7 +37,7 @@ class CarCard extends StatelessWidget {
                     child: PageView(
                       children: car.images.isNotEmpty
                           ? car.images.map((url) => ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(Sizes.radiusTile),
                               child: Image.network(
                                 url,
                                 fit: BoxFit.cover,
@@ -55,7 +45,7 @@ class CarCard extends StatelessWidget {
                             )).toList()
                           : [
                               ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
+                                borderRadius: BorderRadius.circular(Sizes.radiusTile),
                                 child: Image.network(
                                   'https://via.placeholder.com/260x150',
                                   fit: BoxFit.cover,
@@ -67,18 +57,7 @@ class CarCard extends StatelessWidget {
 
 
 
-                // Expanded(
-                //   flex:1,
-
-                //     child: SizedBox(
-                //     height: 150,
-                //     child: PageView(
-                //       children: car.images.isNotEmpty
-                //           ? car.images.map((url) => Image.network(url, fit: BoxFit.cover)).toList()
-                //           : [Image.network('https://via.placeholder.com/260x150')],
-                //     ),
-                //     )
-                //   ),
+               
 
                 const SizedBox(width: 12),
 
@@ -91,7 +70,7 @@ class CarCard extends StatelessWidget {
 
                       ///Name and Model
                       Text(
-                       '${car.brand ?? "–"} ${car.model ?? "–"}',
+                       '${car.brand} ${car.model}',
 
                         style: const TextStyle(
                           fontSize: 18,
@@ -114,7 +93,7 @@ class CarCard extends StatelessWidget {
 
                           /// price
                            Text(
-                           '${car.price ?? "–"}€',
+                           '${car.price.toStringAsFixed(0)}€',
                             
                             style: TextStyle(
                               fontSize: 18,
@@ -126,8 +105,8 @@ class CarCard extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
-                              color: Colors.green[600],
-                              borderRadius: BorderRadius.circular(6),
+                              color: AppColors.cardPriceBadge,
+                              borderRadius: BorderRadius.circular(Sizes.radiusChip),
                             ),
 
                             
@@ -144,7 +123,7 @@ class CarCard extends StatelessWidget {
 
                        /// Insurance Info
                        Text(
-                        "EZ ${car.next_Tuv ?? "–"} •${car.milleage ?? "–"}Km •${car.engine_power ?? "–"} KW • ${car.fueltype?? "–"} ",
+                        "EZ ${car.next_Tuv} • ${car.milleage.toStringAsFixed(0)} km • ${car.engine_power} kW • ${car.fueltype}",
                         style: TextStyle(fontSize: 12),
                       ),
                     ],
@@ -200,11 +179,11 @@ class CarCard extends StatelessWidget {
   return Row(
     children: List.generate(5, (index) {
       if (index < rating.floor()) {
-        return const Icon(Icons.star, color: Colors.amber, size: 16);
+        return const Icon(Icons.star, color: AppColors.cardRatingIcon, size: 16);
       } else if (index < rating) {
-        return const Icon(Icons.star_half, color: Colors.amber, size: 16);
+        return const Icon(Icons.star_half, color: AppColors.cardRatingIcon, size: 16);
       } else {
-        return const Icon(Icons.star_border, color: Colors.amber, size: 16);
+        return const Icon(Icons.star_border, color: AppColors.cardRatingIcon, size: 16);
       }
     }),
   );

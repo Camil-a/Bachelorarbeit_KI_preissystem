@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:usecar_ki_system/models/vehicule/damaged_features/damaged_report.dart';
 import 'dart:convert';
@@ -13,13 +14,13 @@ class FormApiClient {
       "technic": technich.toJson(),
       "damaged": damaged.toJson(),
     };
-
+    debugPrint("Sending form data: $bodyData");
     final response = await http.post(
       url,
       headers: {"Content-Type": "application/json"},
       body: jsonEncode(bodyData),
     );
-  print(response);
+  debugPrint('Response status: ${response.statusCode}');
 
     if (response.statusCode != 200) {
       throw Exception("Error sending form");
@@ -35,7 +36,7 @@ class FormApiClient {
   final response = await http.get(Uri.parse('http://localhost:5000/cars')); 
   // Android Emulator benutzt 10.0.2.2 statt localhost
 
-    print("Response: ${response.statusCode}");
+    debugPrint("Response: ${response.statusCode}");
 
   if (response.statusCode == 200) {
     return json.decode(response.body);

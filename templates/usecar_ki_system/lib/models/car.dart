@@ -39,9 +39,6 @@ class Cars {
   // }
 
   factory Cars.fromJson(Map<String, dynamic> json) {
-
-    print('-----------Json-----------');
-    print(json);
   return Cars(
     brand: json['brand'] ?? '',
     model: json['model'] ?? '',

@@ -41,21 +41,28 @@ class TechnicCarListing {
 
    
   Map<String, dynamic> toJson() {
-  return {
-    "Brand": brand,  // Leerzeichen wie im Excel
-    "Model": model,
-    "year_of_manufacture": year,  // exakt wie Excel
-    "Engine_power(kilowatt)": enginePowerPs,
-    "Engine_power_(Horsepower)": enginePowerHs,
-    "Transmission_type": transmissionType,
-    "Mileage": mileage,
-    "Fueltype": engineType,
-    "nextTUV": '$nextTuvDay.$nextTuvMonate.$nextTuvYear',
-    "Nber_previous_owners": nberPreviousOwners ,
-    "Body_style": bodyStyle,
-    "Tire_type": tireType,
-    "Accident_history": accidentHistory
-  };
-}
+    // Calculate days to TÜV from the three dropdown values
+    final tuvDay   = int.parse(nextTuvDay);
+    final tuvMonth = int.parse(nextTuvMonate);
+    final tuvYear  = int.parse(nextTuvYear);
+    final nextTUV  = DateTime(tuvYear, tuvMonth, tuvDay);
+    final daysToTUV = nextTUV.difference(DateTime.now()).inDays;
+
+    return {
+      "Brand": brand,
+      "Model": model,
+      "year_of_manufacture": int.parse(year), // manufacture year, not TÜV year
+      "Engine_power(kilowatt)": enginePowerPs,
+      "Engine_power_(Horsepower)": enginePowerHs,
+      "Transmission_type": transmissionType,
+      "Mileage": mileage,
+      "Fueltype": engineType,
+      "nextTUV": daysToTUV,
+      "Nber_previous_owners": int.tryParse(nberPreviousOwners) ?? 0,
+      "Body_style": bodyStyle,
+      "Tire_type": tireType,
+      "Accident_history": accidentHistory,
+    };
+  }
 
   }

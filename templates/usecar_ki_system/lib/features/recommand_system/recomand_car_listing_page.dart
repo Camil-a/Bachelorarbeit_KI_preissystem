@@ -1,65 +1,69 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:usecar_ki_system/features/api_client/filter_api.dart';
 import 'package:usecar_ki_system/features/recommand_system/main_content.dart';
 import 'package:usecar_ki_system/models/car.dart';
+import 'package:usecar_ki_system/models/vehicule/technische_features/vehicule_Form_data_save.dart';
 import 'package:usecar_ki_system/shared/widgets/custom_appbar.dart';
-import 'package:http/http.dart' as http;
-
-
 
 class RecommandCarListingPage extends StatefulWidget {
   const RecommandCarListingPage({super.key});
 
   @override
-  _RecommandCarListingPageState createState() =>
+  State<RecommandCarListingPage> createState() =>
       _RecommandCarListingPageState();
 }
 
 class _RecommandCarListingPageState extends State<RecommandCarListingPage> {
-  late Future<List<Cars>> carsFuture_model;
-   late FilterApiClient api;
+  late Future<List<Cars>> currentCarsFuture;
+  late FilterApiClient api;
+
+  String? selectedModel;
+  double? selectedPrice;
+  double? selectedMileage;
+  CarDataSaved vehiculeDataSave = CarDataSaved();
 
   @override
   void initState() {
     super.initState();
-
-    api= FilterApiClient();
-      _loadCars();
+    api = FilterApiClient();
+    currentCarsFuture = api.fetchRecommendation_price(3000);
   }
 
- 
-  void _loadCars() {
-    carsFuture_model = api.fetchRecommendation_model('Doblo cargo');
-    // Wenn du sofort die Daten sehen willst:
-    carsFuture_model.then((carsList) {
-      print('Erstes Auto: ${carsList[0].brand}');
+  void _onFilterChanged(CarDataSaved data) {
+    setState(() {
+      selectedModel = data.model;
+      selectedPrice = data.price;
+      selectedMileage = data.mileage;
 
-      print('Erstes Auto price: ${carsList[0].engine_power}');
-
+      if (selectedModel != null) {
+        selectedPrice = null;
+        currentCarsFuture = api.fetchRecommendation_model(selectedModel!);
+      } else if (selectedPrice != null) {
+        selectedModel = null;
+        currentCarsFuture = api.fetchRecommendation_price(selectedPrice!);
+      } else {
+        currentCarsFuture = api.fetchRecommendation_price(3000);
+      }
     });
   }
- 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        onHelp: () => print("help"),
-        onProfile: () => print("profile"),
+        onHelp: () {},
+        onProfile: () {},
       ),
       body: Row(
         children: [
-         
-          // Hauptbereich
-          Expanded(child: MainContent(carsFuture: carsFuture_model )),
-
-        
+          Expanded(
+            child: MainContent(
+              carsFuture: currentCarsFuture,
+              onFilterChanged: _onFilterChanged,
+            ),
+          ),
         ],
       ),
     );
   }
-
-  
 }
-

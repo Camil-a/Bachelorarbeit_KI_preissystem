@@ -1,5 +1,6 @@
-
 import 'package:flutter/material.dart';
+import 'package:usecar_ki_system/shared/constants/colors.dart';
+import 'package:usecar_ki_system/shared/constants/sizes.dart';
 
 class DropdownField extends StatelessWidget {
   final String label;
@@ -7,18 +8,14 @@ class DropdownField extends StatelessWidget {
   final ValueChanged<String?> onChanged;
   final List<String> items;
   final bool isDropdownOnly;
-  
-
 
   String? validatorRequired(String? value, {bool isNumber = false}) {
-  if (value == null || value.trim().isEmpty) {
-    return 'Pflichtfeld';
+    if (value == null || value.trim().isEmpty) return 'Pflichtfeld';
+    if (isNumber && double.tryParse(value) == null) {
+      return 'Bitte eine gültige Zahl eingeben';
+    }
+    return null;
   }
-  if (isNumber && double.tryParse(value) == null) {
-    return 'Bitte eine gültige Zahl eingeben';
-  }
-  return null; // alles ok
-}
 
   const DropdownField({
     super.key,
@@ -33,24 +30,38 @@ class DropdownField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        //if (!isDropdownOnly) Text(label, style: TextStyle(fontWeight: FontWeight.w500)),
-        if (!isDropdownOnly) SizedBox(width: 10),
+        if (!isDropdownOnly) const SizedBox(width: 10),
         Expanded(
           child: DropdownButtonFormField<String>(
             isExpanded: true,
             value: value,
-            validator: (value) => (value == null ) ? 'Please enter the value' : null,
+            validator: (value) =>
+                (value == null) ? 'Please enter the value' : null,
             decoration: InputDecoration(
-              labelText: label ?? "please select",
+              labelText: label,
               filled: true,
-              fillColor: Colors.grey[100],
-              border: OutlineInputBorder(),
-              suffixIcon: value !=null 
-              ? Icon(Icons.check, color: Colors.green, size: 16):null,
+              fillColor: AppColors.inputFill,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(Sizes.radiusInput),
+                borderSide: const BorderSide(color: AppColors.inputBorder),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(Sizes.radiusInput),
+                borderSide: const BorderSide(color: AppColors.inputBorder),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(Sizes.radiusInput),
+                borderSide: const BorderSide(color: AppColors.primary, width: 2),
+              ),
+              suffixIcon: value != null
+                  ? const Icon(Icons.check,
+                      color: AppColors.inputValidIcon, size: 16)
+                  : null,
             ),
-            items: items.map((item) {
-              return DropdownMenuItem<String>(value: item, child: Text(item));
-            }).toList(),
+            items: items
+                .map((item) =>
+                    DropdownMenuItem<String>(value: item, child: Text(item)))
+                .toList(),
             onChanged: onChanged,
           ),
         ),

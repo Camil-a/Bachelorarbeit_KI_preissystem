@@ -5,10 +5,12 @@ import 'package:usecar_ki_system/models/vehicule/damaged_features/damaged_form_d
 import 'package:usecar_ki_system/models/vehicule/damaged_features/damaged_report.dart';
 import 'package:usecar_ki_system/models/vehicule/technische_features/tchenic_carlisting.dart';
 import 'package:usecar_ki_system/models/vehicule/technische_features/vehicule_Form_data_save.dart';
-import 'package:usecar_ki_system/routes/app_route_name.dart';
 import 'package:usecar_ki_system/shared/vehicule_widgets/damaged_report.dart';
 import 'package:usecar_ki_system/shared/vehicule_widgets/vehicule_details.dart';
-import '../shared/widgets/nav_link.dart';
+import 'package:usecar_ki_system/shared/widgets/price_chart.dart';
+import 'package:usecar_ki_system/shared/constants/colors.dart';
+import 'package:usecar_ki_system/shared/constants/sizes.dart';
+import 'package:usecar_ki_system/shared/widgets/custom_appbar.dart';
 
 
 class CarSalesFormPages extends StatefulWidget {
@@ -31,25 +33,12 @@ class _CarSalesFormPageState extends State<CarSalesFormPages> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: AppColors.scaffoldBackground,
 
       // ================= APPBAR =================
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: Row(
-          //mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Image.asset('assets/images/logo_sfm.png', height: 36),
-            Spacer(),
-
-            Flexible(child:NavLink(label: 'Predict Use Case', routeName: predictCarRouterName),
-            ),
-            SizedBox(width: 16),
-            Flexible(child:NavLink(label: 'Car Recommendation', routeName: recommandRouterName),
-            ) ,
-          ],
-        ),
+      appBar: CustomAppBar(
+        onHelp: () {},
+        onProfile: () {},
       ),
 
       // ================= BODY =================
@@ -98,8 +87,14 @@ class _CarSalesFormPageState extends State<CarSalesFormPages> {
                  buildPredictButton(),
 
 
-             /// Result Card
-              if (predictedPrice != null) buildResultCard(),
+              /// Result Card + Chart
+              if (predictedPrice != null) ...[
+                buildResultCard(),
+                PricePredictionChart(
+                  predictedPrice: predictedPrice!,
+                  mileage: double.tryParse(mileageController.text) ?? 0,
+                ),
+              ],
             ],
           ),
         ),
@@ -115,9 +110,9 @@ class _CarSalesFormPageState extends State<CarSalesFormPages> {
       width: double.infinity,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFE63946),
+          backgroundColor: AppColors.primary,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(Sizes.radiusButton),
           ),
           textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
@@ -131,21 +126,48 @@ class _CarSalesFormPageState extends State<CarSalesFormPages> {
   // =========================================================
   Widget buildResultCard() {
     return Card(
-      color: Colors.green.shade50,
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Sizes.radiusCard)),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(Sizes.radiusCard),
+          gradient: LinearGradient(
+            colors: [AppColors.resultGradientTop, AppColors.resultGradientBottom],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+        child: Row(
           children: [
-            const Text("Predicted Price"),
-            const SizedBox(height: 6),
-            Text(
-              "€ ${predictedPrice!.toStringAsFixed(2)}",
-              style: const TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Colors.green,
-              ),
+            const Icon(Icons.price_check, color: Colors.white, size: 36),
+            const SizedBox(width: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+
+                // Title
+                const Text(
+                  'Predicted Sale Price',
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 4),
+
+                // Price Value
+                Text(
+                  '€ ${predictedPrice!.toStringAsFixed(2)}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -158,7 +180,6 @@ class _CarSalesFormPageState extends State<CarSalesFormPages> {
   Future<void> _predictPrice() async {
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
-        print('variable::::::');
      // prepare data to send to API
                              
   try {
@@ -234,7 +255,7 @@ class _CarSalesFormPageState extends State<CarSalesFormPages> {
                                 predictedPrice = result;
                               });
                             } catch (e) {
-                              print("FEHLER: $e");
+                              debugPrint('Prediction error: $e');
                             }
                           }
 

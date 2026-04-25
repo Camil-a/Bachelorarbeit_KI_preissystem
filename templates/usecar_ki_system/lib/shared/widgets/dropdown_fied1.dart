@@ -1,5 +1,7 @@
 
 import 'package:flutter/material.dart';
+import 'package:usecar_ki_system/shared/constants/colors.dart';
+import 'package:usecar_ki_system/shared/constants/sizes.dart';
 
 class DropdownFields extends StatelessWidget {
   final String label;
@@ -45,12 +47,23 @@ class DropdownFields extends StatelessWidget {
                     },
 
             decoration: InputDecoration(
-              labelText: label ?? "please select",
+              labelText: label,
               filled: true,
-              fillColor: Colors.grey[100],
-              border: OutlineInputBorder(),
-              suffixIcon: value !=null 
-              ? Icon(Icons.check, color: Colors.green, size: 16):null,
+              fillColor: AppColors.inputFill,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(Sizes.radiusInput),
+                borderSide: const BorderSide(color: AppColors.inputBorder),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(Sizes.radiusInput),
+                borderSide: const BorderSide(color: AppColors.inputBorder),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(Sizes.radiusInput),
+                borderSide: const BorderSide(color: AppColors.primary, width: 2),
+              ),
+              suffixIcon: value != null
+              ? const Icon(Icons.check, color: AppColors.inputValidIcon, size: 16) : null,
             ),
             items: items.map((item) {
               return DropdownMenuItem<String>(value: item, child: Text(item));

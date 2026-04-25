@@ -1,11 +1,7 @@
 // ===== SEITENKOMPONENTEN =====
 import 'package:flutter/material.dart';
-import 'package:usecar_ki_system/shared/widgets/active_filter_chip.dart';
-import 'package:usecar_ki_system/shared/widgets/card_card.dart';
 import 'package:usecar_ki_system/shared/widgets/filter_group.dart';
 import 'package:usecar_ki_system/shared/widgets/save_search_button.dart';
-
-import '../../models/carData.dart';
 
 class FilterSidebar extends StatelessWidget {
   const FilterSidebar({super.key});

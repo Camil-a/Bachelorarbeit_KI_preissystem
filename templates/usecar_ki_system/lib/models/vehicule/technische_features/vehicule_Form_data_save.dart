@@ -1,6 +1,4 @@
 
-
-
 class VehiculeFormDataSaved {
    String? brand;
    String? model;
@@ -17,4 +15,11 @@ class VehiculeFormDataSaved {
    String? nberPreviousOwners;
    double? mileage;
    String? engineType;
+}
+
+class CarDataSaved{
+  String? model;
+  double? price;
+  double? mileage;
+
 }
