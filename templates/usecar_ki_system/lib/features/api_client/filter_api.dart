@@ -8,9 +8,9 @@ import 'package:usecar_ki_system/models/car.dart';
 
 class FilterApiClient {
 
- Future<List<Cars>> fetchRecommendation_model(String model) async {
+ Future<List<Cars>> fetchRecommendationModel(String model) async {
 
-  final url = 'http://localhost:5000/recommend?model=$model';
+  final url = 'http://localhost:5001/recommend?model=$model';
   debugPrint("Request URL: $url");
 
   final response = await http.get(Uri.parse(url));
@@ -28,9 +28,24 @@ class FilterApiClient {
 
 
 
- Future<List<Cars>> fetchRecommendation_price(double price) async {
+ Future<List<Cars>> fetchSearch(String query) async {
+  final url = 'http://localhost:5001/search?q=${Uri.encodeComponent(query)}';
+  debugPrint("Request URL: $url");
 
-  final url = 'http://localhost:5000/recommend_price?sale_price=$price';
+  final response = await http.get(Uri.parse(url));
+
+  if (response.statusCode == 200) {
+    List data = json.decode(response.body);
+    return data.map((e) => Cars.fromJson(e)).toList();
+  } else {
+    throw Exception('Failed to load search results');
+  }
+}
+
+
+ Future<List<Cars>> fetchRecommendationPrice(double price) async {
+
+  final url = 'http://localhost:5001/recommend_price?sale_price=$price';
   debugPrint("Request URL: $url");
 
   final response = await http.get(Uri.parse(url));

@@ -23,36 +23,49 @@ class MainContent extends StatefulWidget {
 }
 
 class _MainContentState extends State<MainContent> {
- 
- // sort and save search
   String selectedValue = 'Model';
   TextEditingController priceController = TextEditingController();
   TextEditingController mileageController = TextEditingController();
-  // Model Auswahl
+  TextEditingController searchController = TextEditingController();
   String? selectedModel;
 
-
-void _sendFilter() {
-  CarDataSaved data = CarDataSaved();
-
-  // data.model = selectedModel;
-  // data.price = double.tryParse(priceController.text);
-  // data.mileage = double.tryParse(mileageController.text);
-
-    if (selectedValue == 'Model') {
-    data.model = selectedModel;
-    data.price = null; // wichtig
-  } else if (selectedValue == 'Price') {
-    data.model = null; // wichtig
-    data.price = double.tryParse(priceController.text);
+  @override
+  void dispose() {
+    priceController.dispose();
+    mileageController.dispose();
+    searchController.dispose();
+    super.dispose();
   }
 
-  widget.onFilterChanged(data);
-}
+  void _sendFilter() {
+    CarDataSaved data = CarDataSaved();
+    if (selectedValue == 'Model') {
+      data.model = selectedModel;
+    } else if (selectedValue == 'Price') {
+      data.price = double.tryParse(priceController.text);
+    }
+    widget.onFilterChanged(data);
+  }
+
+  void _onSearchSubmit() {
+    final input = searchController.text.trim();
+    if (input.isEmpty) return;
+
+    // Remove currency symbol and spaces, then try to parse as a number (price)
+    final cleaned = input.replaceAll('€', '').replaceAll(' ', '');
+    final asPrice = double.tryParse(cleaned);
+
+    final data = CarDataSaved();
+    if (asPrice != null) {
+      data.price = asPrice;
+    } else {
+      data.searchQuery = input;
+    }
+    widget.onFilterChanged(data);
+  }
   @override
   Widget build(BuildContext context) {
     return Column(
-    //  spacing: 16,
       children: [
 
         /// search bar to describe the car you are looking for
@@ -105,21 +118,19 @@ void _sendFilter() {
     );
   }
 
-/// search bar to describe the car you are looking for
   Widget _buildSearchBar() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: TextField(
+        controller: searchController,
+        onSubmitted: (_) => _onSearchSubmit(),
         decoration: InputDecoration(
-          hintText: 'Beschreibe, welches Auto du suchst',
+          hintText: 'Beschreiben Sie, welches Auto Sie suchen (Modell, Marke, Preis)',
           prefixIcon: const Icon(Icons.search),
-
-
           suffixIcon: IconButton(
             icon: const Icon(Icons.arrow_forward),
-            onPressed: () {},
+            onPressed: _onSearchSubmit,
           ),
-
           filled: true,
           fillColor: AppColors.inputFill,
           border: OutlineInputBorder(
