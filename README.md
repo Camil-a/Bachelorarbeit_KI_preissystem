@@ -206,3 +206,4 @@ Run the notebooks in order:
 - Comments throughout the codebase are in German (TÜV = German vehicle inspection)
 - XGBoost was selected over linear regression based on accuracy benchmarks in `5-modelling/algorithmu.ipynb`
 - The Flutter app targets web, Android, and iOS from a single codebase
+- The recommendation system is designed to be modular, allowing for future expansion (e.g., adding more filters or improving the similarity metrics)
