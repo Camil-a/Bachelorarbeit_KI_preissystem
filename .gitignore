@@ -15,10 +15,17 @@
 /templates/usecar_ki_system/.idea/
 /templates/usecar_ki_system/.metadata
 /templates/usecar_ki_system/analysis_options.yaml
+**/templates/MyApplication/
 **/MyApplication/
-/templates/MyApplication/gradlew
-/templates/MyApplication/.gradlew.bat
-/templates/MyApplication/.idea
+/Data/usecar_image/
+
+**/backend/5-modelling/catboost_info/
+**/backend/__pycache__/
+**/backend/Data/usecar_image/
+__pycache__/
+*.py[cod]
+
+
 
 
 
