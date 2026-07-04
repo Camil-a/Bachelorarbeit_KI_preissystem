@@ -1,7 +1,7 @@
 from flask import Flask
-from backend.formular import form_bp  # Import the blueprint from the module where it's defined
+from formular import form_bp  # Import the blueprint from the module where it's defined
 from flask_cors import CORS
-from backend.server import filter_bp
+from server import filter_bp
 
 
 app = Flask(__name__)
@@ -21,5 +21,5 @@ if __name__ == "__main__":
 
     print('Hallo')
 
-    app.run(debug=True, port=5001)
+    app.run(host="0.0.0.0", debug=True, port=5001)
 
