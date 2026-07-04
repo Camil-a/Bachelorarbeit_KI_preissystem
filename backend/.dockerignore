@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.git/
+.vscode/
+
+# Jupyter Notebooks (nur für Entwicklung gedacht)
+*.ipynb
+
+# Falls die Joblib-Dateien oder Outputs zu groß sind und dynamisch 
+# generiert werden, hier ausschließen. Wenn die App sie zum Starten 
+# zwingend braucht, entferne die Raute (#) vor den nächsten Zeilen:
+# Data/
+outputs/
+# *.joblib

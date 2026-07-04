@@ -1,16 +1,19 @@
-FROM python:3.12-slim
+FROM python:3.8-slim
 
 WORKDIR /app
+
+# System-Abhängigkeiten (wichtig für XGBoost, da es C++ Bibliotheken nutzt)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app.py .
-COPY backend/ ./backend/
-COPY recommendsystem/ ./recommendsystem/
-COPY 5-modelling/ ./5-modelling/
-COPY Data/usecar_image/ ./Data/usecar_image/
+# 
+COPY . .
 
+# port, auf dem die Anwendung läuft
 EXPOSE 5001
 
 CMD ["python", "app.py"]
