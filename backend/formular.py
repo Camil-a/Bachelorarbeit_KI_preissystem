@@ -14,8 +14,8 @@ data=0
 
 
 
-#model_path = os.path.join(os.path.dirname(__file__), '../5-modelling/model_linear.joblib')
-model_path = os.path.join(os.path.dirname(__file__), '../5-modelling/model_xGboox.joblib')
+#model_path = os.path.join(os.path.dirname(__file__), '5-modelling/model_linear.joblib')
+model_path = os.path.join(os.path.dirname(__file__), '5-modelling/model_xGboox.joblib')
 
 # Load the trained linear regression model
 with open(model_path, 'rb') as f:
