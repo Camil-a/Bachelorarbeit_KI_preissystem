@@ -47,7 +47,10 @@ class DropdownField extends StatelessWidget {
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(Sizes.radiusInput),
-                borderSide: const BorderSide(color: AppColors.inputBorder),
+                borderSide: BorderSide(
+                  color: value != null ? AppColors.inputValidIcon : AppColors.inputBorder,
+                  width: value != null ? 1.5 : 1.0,
+                ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(Sizes.radiusInput),

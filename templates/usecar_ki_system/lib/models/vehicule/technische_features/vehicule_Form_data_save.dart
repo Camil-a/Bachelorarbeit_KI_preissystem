@@ -17,9 +17,9 @@ class VehiculeFormDataSaved {
    String? engineType;
 }
 
-class CarDataSaved{
+class CarDataSaved {
   String? model;
+  String? searchQuery;
   double? price;
   double? mileage;
-
 }

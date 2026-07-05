@@ -12,6 +12,8 @@ class CarCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isPhone = MediaQuery.of(context).size.width < 600;
+
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
@@ -23,150 +25,119 @@ class CarCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            /// TOP ROW (Bild + Infos)
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: 16,
-              children: [
-
-
-
-                  SizedBox(
-                    width: 260,
-                    height: 150,
-                    child: PageView(
-                      children: car.images.isNotEmpty
-                          ? car.images.map((url) => ClipRRect(
-                              borderRadius: BorderRadius.circular(Sizes.radiusTile),
-                              child: Image.network(
-                                url,
-                                fit: BoxFit.cover,
-                              ),
-                            )).toList()
-                          : [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(Sizes.radiusTile),
-                                child: Image.network(
-                                  'https://via.placeholder.com/260x150',
-                                  fit: BoxFit.cover,
-                                ),
-                              )
-                            ],
-                    ),
-                  ),
-
-
-
-               
-
-                const SizedBox(width: 12),
-
-                /// Infos
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    //spacing: 16,
-                    children: [
-
-                      ///Name and Model
-                      Text(
-                       '${car.brand} ${car.model}',
-
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-
-                      const SizedBox(height: 4),
-
-                      const Text(
-                        "BASIS 2WD STANDHEIZUNG + RÜCKFAHRKAMERA uvm",
-                        style: TextStyle(fontSize: 12),
-                      ),
-
-                      const SizedBox(height: 8),
-
-                      /// Preis + Bewertung
-                      Row(
-                        children: [
-
-                          /// price
-                           Text(
-                           '${car.price.toStringAsFixed(0)}€',
-                            
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: AppColors.cardPriceBadge,
-                              borderRadius: BorderRadius.circular(Sizes.radiusChip),
-                            ),
-
-                            
-                            child: const Text(
-                              "Sehr guter Preis",
-                              style: TextStyle(
-                                  color: Colors.white, fontSize: 10),
-                            ),
-                          )
-                        ],
-                      ),
-
-                      const SizedBox(height: 6),
-
-                       /// Insurance Info
-                       Text(
-                        "EZ ${car.next_Tuv} • ${car.milleage.toStringAsFixed(0)} km • ${car.engine_power} kW • ${car.fueltype}",
-                        style: TextStyle(fontSize: 12),
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
-
-
-           
+            // Phone: image on top full-width, info below
+            // Wide: image left (260px), info right
+            if (isPhone)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildImage(double.infinity, 200),
+                  const SizedBox(height: 12),
+                  _buildInfo(isPhone: true),
+                ],
+              )
+            else
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildImage(260, 150),
+                  const SizedBox(width: 16),
+                  Expanded(child: _buildInfo(isPhone: false)),
+                ],
+              ),
 
             const Divider(height: 20),
 
-            /// DEALER INFO and RATING
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-
-              spacing: 10,
-              children: [
-                
-                 Text(
-                    "Autohaus Liebe",
-                    style: TextStyle(fontSize: 12),
-                  ),
-               
- 
-                    ///dynamic version rating
-                              Row(
-                  children: [
-                    // buildRating(cars.dealer.rating),
-                    // const SizedBox(width: 4),
-                    // Text(
-                    //   '${cars.dealer.rating} (${cars.dealer.reviews})',
-                    //   style: const TextStyle(fontSize: 12),
-                    // ),
-                  ],
-                )
-
-              ],
+            Text(
+              "Autohaus Liebe",
+              style: const TextStyle(fontSize: 12),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildImage(double width, double height) {
+    final pages = car.images.isNotEmpty
+        ? car.images
+            .map((url) => ClipRRect(
+                  borderRadius: BorderRadius.circular(Sizes.radiusTile),
+                  child: Image.network(url, fit: BoxFit.cover),
+                ))
+            .toList()
+        : [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(Sizes.radiusTile),
+              child: Image.network(
+                'https://via.placeholder.com/260x150',
+                fit: BoxFit.cover,
+              ),
+            )
+          ];
+    return SizedBox(width: width, height: height, child: PageView(children: pages));
+  }
+
+  Widget _buildInfo({required bool isPhone}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '${car.brand} ${car.model}',
+          style: TextStyle(
+            fontSize: isPhone ? 16 : 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 4),
+        const Text(
+          "BASIS 2WD STANDHEIZUNG + RÜCKFAHRKAMERA uvm",
+          style: TextStyle(fontSize: 12),
+        ),
+        const SizedBox(height: 8),
+
+        // Price + badge — Wrap prevents overflow on small widths
+        Wrap(
+          spacing: 8,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Text(
+              '${car.price.toStringAsFixed(0)}€',
+              style: TextStyle(
+                fontSize: isPhone ? 16 : 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: AppColors.cardPriceBadge,
+                borderRadius: BorderRadius.circular(Sizes.radiusChip),
+              ),
+              child: const Text(
+                "Sehr guter Preis",
+                style: TextStyle(color: Colors.white, fontSize: 10),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+
+        // Details — Wrap so items flow to next line on narrow screens
+        Wrap(
+          spacing: 4,
+          runSpacing: 2,
+          children: [
+            Text("EZ ${car.next_Tuv}", style: const TextStyle(fontSize: 12)),
+            const Text("•", style: TextStyle(fontSize: 12)),
+            Text("${car.milleage.toStringAsFixed(0)} km", style: const TextStyle(fontSize: 12)),
+            const Text("•", style: TextStyle(fontSize: 12)),
+            Text("${car.engine_power} kW", style: const TextStyle(fontSize: 12)),
+            const Text("•", style: TextStyle(fontSize: 12)),
+            Text(car.fueltype, style: const TextStyle(fontSize: 12)),
+          ],
+        ),
+      ],
     );
   }
 

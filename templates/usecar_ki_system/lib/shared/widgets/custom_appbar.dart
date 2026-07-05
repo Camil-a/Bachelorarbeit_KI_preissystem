@@ -35,8 +35,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: Row(
         children: [
           Image.asset('assets/images/logo_sfm.png', height: 34),
+          
           const SizedBox(width: 28),
-          const _NavItems(),
+          // const Flexible(child: _NavItems()),
+
+             Expanded(
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: _NavItems(),
+      ),
+    ),
         ],
       ),
 

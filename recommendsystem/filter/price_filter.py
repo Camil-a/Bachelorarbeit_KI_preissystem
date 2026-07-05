@@ -188,3 +188,4 @@ def recommend_hybrid_by_price(price, top_n=20, alpha=0.5):
     except ValueError as e:
         print(e)
         return []        
+    

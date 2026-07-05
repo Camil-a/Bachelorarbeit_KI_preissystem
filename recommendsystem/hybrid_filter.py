@@ -40,7 +40,7 @@ def set_cars(data):
         folder_name = row["images"]
         
         image_urls = [
-            f"http://localhost:5000/usecar_image/{folder_name}/{os.path.basename(img)}"
+            f"http://localhost:5001/usecar_image/{folder_name}/{os.path.basename(img)}"
             for img in row["image_files"]
         ]
         #print(f"Image URLs for {folder_name}:", image_urls)
@@ -109,7 +109,7 @@ def save_image_to_folder_in_datas(base_image_dir):
             print(f" Folder not found: {folder_path}")    
 save_image_to_folder_in_data(IMAGE_ROOT)
     
-def recommend_contentbased_by_models(model_name, top_n=5):
+def recommend_contentbased_by_models(model_name, top_n=20):
 
     try:    # Prüfen, ob das Modell im Datensatz existiert
         if model_name not in data[feature_Model].astype(str).values:
@@ -139,7 +139,7 @@ def recommend_contentbased_by_models(model_name, top_n=5):
 
 
 
-def recommend_similar_cars_by_price(price, top_n=10):
+def recommend_similar_cars_by_price(price, top_n=20):
     try:
         # Prüfen, ob mindestens ein Auto mit dem Preis existiert
         if price not in data[feature_price].values:
@@ -167,8 +167,25 @@ def recommend_similar_cars_by_price(price, top_n=10):
         print(f"Fehler: {e}")
         return []  # Leere DataFrame zurückgeben
 
+# print('--------------PRICE--------------')
+# print(   recommend_similar_cars_by_price(6000)
+# )
 
 
+def recommend_by_text(query, top_n=20):
+    """Search by model or brand name (partial, case-insensitive)."""
+     # change query to lowercase and strip whitespace for better matching
+    q = query.lower().strip()
+
+    model_match = data[data['Model'].astype(str).str.lower().str.contains(q, na=False)]
+    if not model_match.empty:
+        return set_cars(model_match.head(top_n))
+
+    brand_match = data[data['Brand'].astype(str).str.lower().str.contains(q, na=False)]
+    if not brand_match.empty:
+        return set_cars(brand_match.head(top_n))
+
+    return []
 
 
 def get_cars():
@@ -184,7 +201,7 @@ def get_cars():
 
             # Baue URLs für alle Bilder in dieser Zeile
             image_urls = [
-                f"http://localhost:5000/usecar_image/{folder_name}/{os.path.basename(img)}"
+                f"http://localhost:5001/usecar_image/{folder_name}/{os.path.basename(img)}"
                 for img in row["image_files"]
             ]
 

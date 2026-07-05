@@ -21,30 +21,17 @@ class Cars {
     required this.images,
   });
 
-  // factory Cars.fromJson(Map<String, dynamic> json) {
-  //   return Cars(
-  //     brand: json['brand'] ?? '',
-  //     model: json['model']  ?? '',
-  //     fueltype: json['fueltype']  ?? '',
-  //     itemId: json['item_id'] ?? 0,
-  //     next_Tuv: json['next_tuv']  ?? '',
-  //     price: (json['price']  ?? 0.0).toDouble(),
-  //     milleage: (json['milleage']  ?? 0.0).toDouble(),
-  //     engine_power: json['engine_power']  ?? 0,
-      
-  //     images: json['images'] == null
-  //         ? []
-  //         : List<String>.from(json['images']),
-  //   );
-  // }
-
+  
+// Factory constructor to create a Cars instance from JSON
   factory Cars.fromJson(Map<String, dynamic> json) {
   return Cars(
-    brand: json['brand'] ?? '',
-    model: json['model'] ?? '',
-    fueltype: json['fueltype'] ?? '',
-    itemId: json['item_id'] ?? 0,
-    next_Tuv: json['next_TUV'] ?? '',
+    brand: (json['brand'] ?? '').toString(),
+    model: (json['model'] ?? '').toString(),
+    fueltype: (json['fueltype'] ?? '').toString(),
+    itemId: (json['item_id'] is String)
+        ? int.tryParse(json['item_id']) ?? 0
+        : json['item_id'] ?? 0,
+    next_Tuv: (json['next_TUV'] ?? '').toString(),
     price: (json['Sale_price'] != null)
         ? (json['Sale_price'] is int
             ? (json['Sale_price'] as int).toDouble()
@@ -53,12 +40,14 @@ class Cars {
     milleage: (json['mileage'] != null)
         ? (json['mileage'] is int
             ? (json['mileage'] as int).toDouble()
-            : double.tryParse(json['milleage'].toString()) ?? 0.0)
+            : double.tryParse(json['mileage'].toString()) ?? 0.0)
         : 0.0,
-    engine_power: json['engine_power'] ?? 0,
+    engine_power: (json['engine_power'] is String)
+        ? int.tryParse(json['engine_power']) ?? 0
+        : json['engine_power'] ?? 0,
     images: json['images'] == null
         ? []
-        : List<String>.from(json['images']),
+        : List<String>.from(json['images'].map((e) => e.toString())),
   );
 }
 

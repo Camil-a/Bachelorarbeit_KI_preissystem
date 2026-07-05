@@ -18,7 +18,7 @@ class NavLink extends StatelessWidget {
       onTap: () => context.go(routeName),
       borderRadius: BorderRadius.circular(Sizes.radiusSmall),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

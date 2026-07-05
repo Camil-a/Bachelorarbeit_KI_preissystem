@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:usecar_ki_system/shared/constants/colors.dart';
 import 'package:usecar_ki_system/shared/constants/sizes.dart';
 
@@ -33,6 +34,8 @@ class TextFieldWithUnit extends StatelessWidget {
       builder: (context, value, child) {
         return TextFormField(
           controller: controller,
+          keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))],
           validator: (value) {
                             // Wenn value null ist UND das Dropdown vom Benutzer nie benutzt wurde
                             if (value == null) return null; 
@@ -52,16 +55,17 @@ class TextFieldWithUnit extends StatelessWidget {
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(Sizes.radiusInput),
-              borderSide: const BorderSide(color: AppColors.inputBorder),
+              borderSide: BorderSide(
+                color: value.text.trim().isNotEmpty ? AppColors.inputValidIcon : AppColors.inputBorder,
+                width: value.text.trim().isNotEmpty ? 1.5 : 1.0,
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(Sizes.radiusInput),
               borderSide: const BorderSide(color: AppColors.primary, width: 2),
             ),
 
-
             suffixIcon: value.text.trim().isNotEmpty
-
                 ? const Icon(Icons.check, color: AppColors.inputValidIcon, size: 16)
                 : null,
           ),

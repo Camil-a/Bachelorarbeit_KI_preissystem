@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:usecar_ki_system/shared/constants/colors.dart';
 import 'package:usecar_ki_system/shared/constants/sizes.dart';
 
@@ -42,6 +43,7 @@ Widget build(BuildContext context) {
                               return null;
                             },
         keyboardType: TextInputType.number,
+        inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))],
 
         decoration: InputDecoration(
           labelText: label,
@@ -53,7 +55,10 @@ Widget build(BuildContext context) {
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(Sizes.radiusInput),
-            borderSide: const BorderSide(color: AppColors.inputBorder),
+            borderSide: BorderSide(
+              color: value.text.trim().isNotEmpty ? AppColors.inputValidIcon : AppColors.inputBorder,
+              width: value.text.trim().isNotEmpty ? 1.5 : 1.0,
+            ),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(Sizes.radiusInput),

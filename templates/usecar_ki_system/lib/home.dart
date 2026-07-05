@@ -33,6 +33,8 @@ class _CarSalesFormPageState extends State<CarSalesFormPages> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
+      
       backgroundColor: AppColors.scaffoldBackground,
 
       // ================= APPBAR =================
@@ -68,6 +70,7 @@ class _CarSalesFormPageState extends State<CarSalesFormPages> {
               //const SizedBox(height: 16),
 
               /// Title
+              /// 
               Text( 'Damages Report',
                        style: TextStyle(fontWeight: FontWeight.bold),
                       ),
@@ -142,32 +145,35 @@ class _CarSalesFormPageState extends State<CarSalesFormPages> {
           children: [
             const Icon(Icons.price_check, color: Colors.white, size: 36),
             const SizedBox(width: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
 
-                // Title
-                const Text(
-                  'Predicted Sale Price',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
+                  // Title
+                  const Text(
+                    'Predicted Sale Price',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
+                  const SizedBox(height: 4),
 
-                // Price Value
-                Text(
-                  '€ ${predictedPrice!.toStringAsFixed(2)}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5,
+                  // Price Value
+                  Text(
+                    '€ ${predictedPrice!.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),

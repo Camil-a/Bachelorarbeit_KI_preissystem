@@ -26,7 +26,8 @@ class _RecommandCarListingPageState extends State<RecommandCarListingPage> {
   void initState() {
     super.initState();
     api = FilterApiClient();
-    currentCarsFuture = api.fetchRecommendation_price(3000);
+    currentCarsFuture = api.fetchRecommendationPrice(3000);
+    
   }
 
   void _onFilterChanged(CarDataSaved data) {
@@ -35,14 +36,16 @@ class _RecommandCarListingPageState extends State<RecommandCarListingPage> {
       selectedPrice = data.price;
       selectedMileage = data.mileage;
 
-      if (selectedModel != null) {
+      if (data.searchQuery != null && data.searchQuery!.isNotEmpty) {
+        currentCarsFuture = api.fetchSearch(data.searchQuery!);
+      } else if (selectedModel != null) {
         selectedPrice = null;
-        currentCarsFuture = api.fetchRecommendation_model(selectedModel!);
+        currentCarsFuture = api.fetchRecommendationModel(selectedModel!);
       } else if (selectedPrice != null) {
         selectedModel = null;
-        currentCarsFuture = api.fetchRecommendation_price(selectedPrice!);
+        currentCarsFuture = api.fetchRecommendationPrice(selectedPrice!);
       } else {
-        currentCarsFuture = api.fetchRecommendation_price(3000);
+        currentCarsFuture = api.fetchRecommendationPrice(3000);
       }
     });
   }
